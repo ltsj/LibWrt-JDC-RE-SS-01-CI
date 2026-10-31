@@ -63,6 +63,17 @@ jobs:
           echo "VERSION_LOG=暂无更新" >> $GITHUB_ENV
         fi
 
+    - name: Patch KERNEL_SIZE (jdcloud_re-ss-01)
+      working-directory: ${{ env.FILE_PATH }}
+      run: |
+        MK=target/linux/qualcommax/image/ipq60xx.mk
+        RANGE='/^define Device[/]jdcloud_re-ss-01$/,/^endef$/'
+        BEFORE=$(sed -n "${RANGE}p" "$MK" | grep KERNEL_SIZE | tr -d '[:space:]')
+        echo "before: $BEFORE"
+        sed -i "${RANGE} s/KERNEL_SIZE := 6144k/KERNEL_SIZE := 8192k/" "$MK"
+        AFTER=$(sed -n "${RANGE}p" "$MK" | grep KERNEL_SIZE | tr -d '[:space:]')
+        echo "after:  $AFTER"
+        if [ "$BEFORE" = "$AFTER" ]; then echo 'ERROR: KERNEL_SIZE patch did not apply'; exit 1; fi
     - name: Update & Install Feeds
       working-directory: ${{ env.FILE_PATH }}
       run: |
