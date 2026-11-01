@@ -135,6 +135,21 @@ jobs:
         mixkey: ${{ env.REPO_BRANCH }}-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}
         prefix: ${{ env.FILE_PATH }}
 
+    - name: Cache ccache
+      uses: actions/cache@v4
+      with:
+        path: ~/.ccache
+        key: ccache-${{ runner.os }}-${{ hashFiles('.config') }}
+        restore-keys: |
+          ccache-${{ runner.os }}-
+
+    - name: Cache build_dir
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.FILE_PATH }}/build_dir
+        key: builddir-${{ runner.os }}-${{ hashFiles('.config') }}
+        restore-keys: |
+          builddir-${{ runner.os }}-
     - name: Download Libraries
       working-directory: ${{ env.FILE_PATH }}
       run: |
